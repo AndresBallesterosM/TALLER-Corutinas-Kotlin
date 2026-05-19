@@ -1,0 +1,45 @@
+# Reflexión — TaskSimulator
+
+## 1. ¿Qué es un hilo (thread) y por qué Android tiene un hilo principal?
+
+Un hilo es una unidad de ejecución dentro de un programa. Permite que varias tareas se realicen de manera concurrente. Android tiene un hilo principal llamado Main Thread o UI Thread, encargado de dibujar la interfaz y responder a las acciones del usuario. Si este hilo se bloquea, la aplicación se congela y puede aparecer el mensaje "Application Not Responding" (ANR).
+
+---
+
+## 2. Explica con tus propias palabras la diferencia entre `Thread.sleep()` y `delay()` de Coroutines.
+
+`Thread.sleep()` detiene completamente el hilo actual, lo que significa que si se usa en el hilo principal la aplicación se congela y deja de responder. En cambio, `delay()` solo pausa la coroutine sin bloquear el hilo, permitiendo que la interfaz continúe funcionando normalmente.
+
+---
+
+## 3. ¿Qué es `viewModelScope` y por qué es importante usarlo en lugar de crear coroutines manualmente?
+
+`viewModelScope` es un alcance de coroutines asociado al ciclo de vida del ViewModel. Todas las coroutines lanzadas dentro de este scope se cancelan automáticamente cuando el ViewModel se destruye. Esto evita fugas de memoria y simplifica el manejo del ciclo de vida.
+
+---
+
+## 4. ¿Cuándo usarías `Dispatchers.IO` vs `Dispatchers.Default`? Da un ejemplo de cada uno.
+
+`Dispatchers.IO` se utiliza para operaciones de entrada y salida, como llamadas a APIs, lectura de archivos o consultas a bases de datos.
+
+Ejemplo:
+- Descargar datos desde un servidor.
+- Leer un archivo JSON.
+
+`Dispatchers.Default` se usa para cálculos intensivos que consumen CPU.
+
+Ejemplo:
+- Procesar imágenes.
+- Realizar operaciones matemáticas complejas.
+
+---
+
+## 5. Si tienes que hacer 3 llamadas a una API que son independientes entre sí, ¿las harías en paralelo o en secuencia? ¿Por qué?
+
+Las haría en paralelo, porque al ser independientes no necesitan esperar unas a otras. Esto reduce significativamente el tiempo total de ejecución y mejora el rendimiento de la aplicación.
+
+---
+
+## 6. ¿Qué pasaría si actualizas la UI desde `Dispatchers.IO`? ¿Cómo lo solucionarías?
+
+Android lanzaría una excepción porque la interfaz solo puede modificarse desde el hilo principal. Para solucionarlo, se debe volver al hilo principal usando `withContext(Dispatchers.Main)` o simplemente actualizar la UI desde una coroutine que ya se esté ejecutando en el Main Thread.
