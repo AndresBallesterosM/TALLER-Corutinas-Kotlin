@@ -1,0 +1,50 @@
+# Respuestas Previas 
+
+## 1. ¿Qué crees que pasa si una app tarda 5 segundos en cargar datos y ese proceso ocurre en el hilo principal?
+
+Si una aplicación tarda 5 segundos en cargar datos y ese proceso se ejecuta en el hilo principal, la interfaz de usuario se congela completamente durante ese tiempo. El usuario no podrá tocar botones, desplazarse por la pantalla ni interactuar con la aplicación. Si el bloqueo dura demasiado, Android puede mostrar el mensaje "La aplicación no responde" (ANR), indicando que la app dejó de responder.
+
+---
+## 2. ¿Alguna vez has visto el mensaje "La aplicación no responde" en tu celular? ¿Por qué crees que aparece?
+
+Sí, este mensaje aparece cuando una aplicación tarda demasiado tiempo en responder a las acciones del usuario. Generalmente ocurre porque el hilo principal está ocupado realizando una tarea pesada, como descargar información de Internet, leer archivos grandes o ejecutar cálculos complejos. Como la interfaz no puede actualizarse ni procesar eventos, Android detecta que la aplicación está bloqueada y muestra el aviso.
+
+---
+## 3. ¿Qué diferencia hay entre hacer dos cosas "al mismo tiempo" y hacer una cosa "mientras esperas" otra?
+
+Hacer dos cosas "al mismo tiempo" significa que ambas tareas se ejecutan en paralelo, utilizando diferentes hilos o coroutines, de modo que avanzan simultáneamente.
+
+Hacer una cosa "mientras esperas" otra significa que una tarea inicia y queda en pausa mientras espera una respuesta o un tiempo determinado, y durante esa espera el programa aprovecha para ejecutar otras tareas sin desperdiciar recursos.
+
+En otras palabras:
+
+- **Al mismo tiempo (paralelismo):** varias tareas avanzan simultáneamente.
+- **Mientras esperas (asincronía):** una tarea se suspende temporalmente y el programa continúa con otras actividades.
+
+
+
+### 1. ¿Por qué `runBlockingTask()` NO usa `viewModelScope.launch`?
+
+`runBlockingTask()` no utiliza `viewModelScope.launch` porque su propósito es demostrar lo que ocurre cuando una tarea pesada se ejecuta directamente en el hilo principal. Al no usar una coroutine, el método se ejecuta de forma síncrona y utiliza `Thread.sleep(4000)`, que detiene completamente el hilo actual durante cuatro segundos. Esto permite observar cómo la aplicación se congela cuando el hilo principal queda bloqueado.
+
+---
+### 2. ¿Qué crees que pasará con la UI cuando presiones el botón de tarea bloqueante?
+
+Cuando se presione el botón de tarea bloqueante, la interfaz dejará de responder durante aproximadamente cuatro segundos. No será posible tocar otros botones, desplazarse por la pantalla ni interactuar con la aplicación. Aunque el código cambia el estado para mostrar un indicador de carga, este no aparecerá inmediatamente porque el hilo principal estará ocupado y no podrá redibujar la pantalla hasta que termine la ejecución de `Thread.sleep()`.
+
+---
+### 3. ¿Por qué `runParallelTasks()` debería ser más rápido que `runSequentialTasks()`?
+
+`runParallelTasks()` debería ser más rápido porque las tres tareas se ejecutan al mismo tiempo en coroutines diferentes. El tiempo total estará determinado por la tarea que más tarde en completarse, que es de 3 segundos.
+
+En cambio, `runSequentialTasks()` ejecuta las tareas una después de otra, por lo que los tiempos se suman:
+
+- Tarea 1: 2 segundos
+- Tarea 2: 3 segundos
+- Tarea 3: 1.5 segundos
+
+Tiempo total aproximado:
+
+2 + 3 + 1.5 = 6.5 segundos
+
+Por esta razón, las tareas paralelas completan el trabajo en mucho menos tiempo que las secuenciales.
